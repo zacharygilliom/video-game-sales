@@ -17,6 +17,7 @@ class VideoGameSales:
         rows = self.connectToDatabase()
         cols = ['Rank', 'Name', 'Platform', 'Year', 'Genre', 'Publisher', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
         self.df = pd.DataFrame(columns=cols, data=rows)
+        print(self.df.head())
 
     def cleanDataframe(self):
         self.df = self.df.astype({'NA_Sales': 'float64', 'EU_Sales':'float64', 'JP_Sales':'float64', 'Other_Sales':'float64', 'Global_Sales':'float64'})
@@ -30,5 +31,15 @@ class VideoGameSales:
 
     def meltDataframe(self, df):
         df= df.melt(id_vars=['Year'], value_vars=['NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales'], var_name='Sales_Region', value_name='Total_Sales')
-        print(df.head())
         return df
+
+    def topThreePlatoformsByYearAndRegion(self, salesRegion):
+        df = self.df
+        df = df.astype({'NA_Sales': 'float64', 'EU_Sales':'float64', 'JP_Sales':'float64', 'Other_Sales':'float64', 'Global_Sales':'float64'})
+        df = df.groupby(by=['Year', 'Platform']).sum()
+        df = df[salesRegion].groupby('Year', group_keys=False).nlargest(3)
+        #df = df.nlargest(10,columns=['NA_Sales'])
+        df = df.reset_index()
+        print(df.head(30))
+        return df
+ 
