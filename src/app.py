@@ -1,5 +1,6 @@
 from connect import  VideoGameSales
 import dash
+import sqlite3
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
@@ -9,13 +10,21 @@ import plotly.express as px
 
 # LAPTOPPATH = "/home/zacharygilliom/pythonProjects/video-game-sales/backend/database/vgsales.db"
 DESKTOPPATH= "/mnt/c/Users/zacha/Documents/pythonProjects/video-game-sales/backend/database/vgsales.db"
-salesData = VideoGameSales(DESKTOPPATH)
+COL_NAMES = ['Rank', 'Name', 'Platform', 'Year', 'Genre', 'Publisher', 'NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales']
+ 
+def connectToDatabase(path):
+    conn = sqlite3.connect(path)
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM sales")
+    rows = cur.fetchall()
+    return rows
 
-salesData.makeDataframe()
-salesData.cleanDataframe()
+ROWS = connectToDatabase(DESKTOPPATH)
+
+salesData = VideoGameSales(ROWS, COL_NAMES)
 
 df_grouped_year = salesData.byYearDataframe()
-df_melted = salesData.meltDataframe(df_grouped_year)
+df_melted = salesData.meltDataframe()
 
 df_region_specific_top_sales= salesData.topThreePlatoformsByYearAndRegion('NA_Sales')
 
