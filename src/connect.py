@@ -16,9 +16,15 @@ class VideoGameSales:
         df= df.melt(id_vars=['Year'], value_vars=['NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales', 'Global_Sales'], var_name='Sales_Region', value_name='Total_Sales')
         return df
 
-    def topThreePlatoformsByYearAndRegion(self, salesRegion):
+    def topThreeGenresByYearAndRegion(self, salesRegion):
+        df = self.df.groupby(by=['Year', 'Genre']).sum()
+        df = df[salesRegion].groupby('Year', group_keys=False).nlargest(3)
+        df = df.reset_index()
+        return df
+
+
+    def topThreePlatformsByYearAndRegion(self, salesRegion):
         df = self.df.groupby(by=['Year', 'Platform']).sum()
         df = df[salesRegion].groupby('Year', group_keys=False).nlargest(3)
         df = df.reset_index()
         return df
- 
